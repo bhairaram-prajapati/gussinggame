@@ -1,0 +1,28 @@
+
+pragma solidity ^0.8.0;
+
+contract NumberGuessingGame {
+    uint private randomNumber; // Stores the random number
+    address payable public owner; // Contract owner
+
+    function initialize() public {
+        require(owner == address(0), "Already initialized");
+        owner = payable(msg.sender);
+        randomNumber = (block.timestamp % 10) + 1; // Generate number between 1-10
+    }
+
+    function guessNumber(uint _guess) public payable {
+        require(msg.value == 1 ether, "Send exactly 1 Ether to play");
+
+        if (_guess == randomNumber) {
+            payable(msg.sender).transfer(2 ether); // Winner gets 2 Ether (1 bet + 1 prize)
+        }
+
+        randomNumber = (block.timestamp % 10) + 1;
+    }
+
+    function withdraw() public {
+        require(msg.sender == owner, "Only owner can withdraw");
+        owner.transfer(address(this).balance);
+    }
+}
